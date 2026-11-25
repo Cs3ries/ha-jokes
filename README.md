@@ -45,6 +45,8 @@ Or open it directly from here:
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Cs3ries&repository=ha-jokes&category=integration)
 
+HACS shows updates when a new release of this fork is available. Install the update through HACS and restart Home Assistant to load the new version.
+
 
 ### Manual Installation
 
@@ -58,6 +60,12 @@ Or open it directly from here:
 ## Configuration
 
 ### Initial Setup
+
+After installing Jokes and restarting Home Assistant, open its setup directly:
+
+[![Add Jokes to Home Assistant](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=ha_jokes)
+
+You can also open the setup through the Home Assistant menu.
 
 1. Go to **Settings** → **Devices & Services**
 2. Click **"+ Add Integration"**

@@ -6,6 +6,8 @@ Bring some humor to your Home Assistant setup with random jokes from multiple so
 
 This integration fetches random jokes from six sources, including WitzAPI, and makes them available as a sensor in Home Assistant. It tries compatible providers in random order and **ships its own Lovelace card**.
 
+After installing Jokes and restarting Home Assistant, [open the Jokes setup](https://my.home-assistant.io/redirect/config_flow_start/?domain=ha_jokes). HACS shows updates when this fork publishes a new release.
+
 ## Key Features
 
 - 🎭 **Multiple Joke Sources** include WitzAPI, JokeAPI v2, icanhazdadjoke.com and Official Joke API. Geek Jokes and Yo Mama Jokes are opt-in sources with unfiltered adult content.
