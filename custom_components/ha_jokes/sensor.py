@@ -14,6 +14,7 @@ import async_timeout
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
@@ -26,11 +27,13 @@ from .const import (
     API_HEADERS_ICANHAZDADJOKE,
     API_HEADERS_JOKEAPI,
     API_HEADERS_OFFICIAL,
+    API_HEADERS_WITZAPI,
     API_HEADERS_YOMAMA,
     API_URL_GEEKJOKES,
     API_URL_ICANHAZDADJOKE,
     API_URL_JOKEAPI,
     API_URL_OFFICIAL,
+    API_URL_WITZAPI,
     API_URL_YOMAMA,
     ATTR_EXPLANATION,
     ATTR_JOKE,
@@ -39,6 +42,7 @@ from .const import (
     ATTR_REFRESH_INTERVAL,
     ATTR_SOURCE,
     DEFAULT_JOKEAPI_LANGUAGE,
+    DEFAULT_MAX_JOKE_LENGTH,
     DEFAULT_PROVIDERS,
     DEFAULT_REFRESH_INTERVAL,
     DOMAIN,
@@ -46,11 +50,13 @@ from .const import (
     PROVIDER_ICANHAZDADJOKE,
     PROVIDER_JOKEAPI,
     PROVIDER_OFFICIAL,
+    PROVIDER_WITZAPI,
     PROVIDER_YOMAMA,
     SENSOR_ICON,
     SENSOR_NAME,
     STATE_ERROR,
     STATE_OK,
+    providers_for_language,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -65,11 +71,11 @@ async def async_setup_entry(
     # Get coordinator from hass.data
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
     
-    # Create main joke sensor and explanation sensor
+    # The config entry's first refresh has already populated the coordinator.
     async_add_entities([
         JokesSensor(coordinator, config_entry),
         JokeExplanationSensor(coordinator, config_entry),
-    ], True)
+    ])
 
 
 class JokesDataUpdateCoordinator(DataUpdateCoordinator):
@@ -77,7 +83,21 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
 
     def _build_provider_configs(self) -> list[dict[str, Any]]:
         """Build provider configurations."""
+        jokeapi_url = f"{API_URL_JOKEAPI}&lang={self._jokeapi_language}"
+        witzapi_limit = 1
+        if self._max_joke_length:
+            jokeapi_url += "&amount=10"
+            witzapi_limit = 20
         return [
+            {
+                "name": PROVIDER_WITZAPI,
+                "url": (
+                    f"{API_URL_WITZAPI}?language={self._jokeapi_language}"
+                    f"&limit={witzapi_limit}"
+                ),
+                "headers": API_HEADERS_WITZAPI,
+                "parser": self._parse_witzapi,
+            },
             {
                 "name": PROVIDER_ICANHAZDADJOKE,
                 "url": API_URL_ICANHAZDADJOKE,
@@ -86,7 +106,7 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
             },
             {
                 "name": PROVIDER_JOKEAPI,
-                "url": f"{API_URL_JOKEAPI}&lang={self._jokeapi_language}",
+                "url": jokeapi_url,
                 "headers": API_HEADERS_JOKEAPI,
                 "parser": self._parse_jokeapi,
             },
@@ -117,15 +137,25 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
         enabled_providers: list[str],
         jokeapi_language: str | None = None,
         config_entry: ConfigEntry | None = None,
+        *,
+        max_joke_length: int = DEFAULT_MAX_JOKE_LENGTH,
     ) -> None:
         """Initialize."""
         self.platforms = []
         self._refresh_interval = refresh_interval
-        self._enabled_providers = enabled_providers if enabled_providers else DEFAULT_PROVIDERS
         self._jokeapi_language = jokeapi_language or DEFAULT_JOKEAPI_LANGUAGE
-        
-        # Filter to only enabled providers
-        self._providers = [p for p in self._build_provider_configs() if p["name"] in self._enabled_providers]
+        self._max_joke_length = max_joke_length
+        compatible_providers = providers_for_language(
+            enabled_providers or DEFAULT_PROVIDERS, self._jokeapi_language
+        )
+        # Older entries could save any combination of language and providers.
+        if not compatible_providers:
+            compatible_providers = [PROVIDER_JOKEAPI]
+        self._providers = [
+            provider
+            for provider in self._build_provider_configs()
+            if provider["name"] in compatible_providers
+        ]
         
         super().__init__(
             hass,
@@ -143,18 +173,30 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
             ATTR_SOURCE: "icanhazdadjoke.com",
         }
 
-    def _parse_jokeapi(self, data: dict) -> dict[str, Any]:
+    def _parse_jokeapi(self, data: dict) -> list[dict[str, Any]]:
         """Parse JokeAPI v2 response."""
-        # JokeAPI returns different formats for single and two-part jokes
-        # We're using type=single, so we get the 'joke' field
-        joke_text = data.get("joke", "")
-        joke_id = str(data.get("id", ""))
-        
-        return {
-            ATTR_JOKE: joke_text,
-            ATTR_JOKE_ID: joke_id,
-            ATTR_SOURCE: "jokeapi.dev",
-        }
+        candidates = data.get("jokes", [data])
+        if data.get("error") or not isinstance(candidates, list):
+            return []
+        return [
+            {
+                ATTR_JOKE: item.get("joke"),
+                ATTR_JOKE_ID: str(item.get("id", "")),
+                ATTR_SOURCE: "jokeapi.dev",
+            }
+            for item in candidates
+            if isinstance(item, dict) and item.get("lang") == self._jokeapi_language
+        ]
+
+    def _parse_witzapi(self, data: list) -> list[dict[str, Any]]:
+        """Parse WitzAPI's list of jokes."""
+        if not isinstance(data, list):
+            raise ValueError("Expected a list of jokes from WitzAPI")
+        return [
+            {ATTR_JOKE: item.get("text"), ATTR_JOKE_ID: "", ATTR_SOURCE: "witzapi.de"}
+            for item in data
+            if isinstance(item, dict) and item.get("language") == self._jokeapi_language
+        ]
 
     def _parse_official_joke_api(self, data: dict) -> dict[str, Any]:
         """Parse Official Joke API response."""
@@ -191,32 +233,37 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
     async def _fetch_from_provider(
         self, session: aiohttp.ClientSession, provider: dict
     ) -> dict[str, Any] | None:
-        """Fetch joke from a specific provider."""
+        """Fetch a matching joke, or return None if the request failed."""
         try:
             async with session.get(
-                provider["url"], headers=provider["headers"]
+                provider["url"],
+                headers=provider["headers"],
+                timeout=aiohttp.ClientTimeout(total=5),
             ) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    parsed = provider["parser"](data)
-                    # Some providers return HTML entities in the joke text --
-                    # JokeAPI's non-English corpora in particular (e.g. the
-                    # German "gro&szlig;en"). The card renders the joke with
-                    # textContent, so they have to be decoded here or the
-                    # entity is shown literally.
-                    if parsed.get(ATTR_JOKE):
-                        parsed[ATTR_JOKE] = html.unescape(parsed[ATTR_JOKE])
-                    _LOGGER.debug(
-                        "Successfully fetched joke from %s", provider["name"]
-                    )
-                    return parsed
-                else:
+                if response.status != 200:
+                    if response.status == 400 and provider["name"] == PROVIDER_JOKEAPI:
+                        error = await response.json()
+                        if isinstance(error, dict) and error.get("code") == 106:
+                            return {}
                     _LOGGER.warning(
                         "Provider %s returned status %s",
                         provider["name"],
                         response.status,
                     )
                     return None
+                parsed = provider["parser"](await response.json())
+                candidates = parsed if isinstance(parsed, list) else [parsed]
+                for candidate in candidates:
+                    text = candidate.get(ATTR_JOKE)
+                    if not isinstance(text, str):
+                        continue
+                    # Measure the text as it will appear in the sensor and card.
+                    text = html.unescape(text).strip()
+                    if text and (
+                        not self._max_joke_length or len(text) <= self._max_joke_length
+                    ):
+                        return {**candidate, ATTR_JOKE: text}
+                return {}
         except Exception as err:
             _LOGGER.warning(
                 "Error fetching from provider %s: %s", provider["name"], err
@@ -233,18 +280,21 @@ class JokesDataUpdateCoordinator(DataUpdateCoordinator):
         
         try:
             async with async_timeout.timeout(30):
-                async with aiohttp.ClientSession() as session:
-                    # Try each provider until one succeeds
-                    for provider in providers:
-                        result = await self._fetch_from_provider(session, provider)
-                        if result:
-                            # Add common attributes
-                            result[ATTR_LAST_UPDATED] = datetime.now().isoformat()
-                            result[ATTR_REFRESH_INTERVAL] = self._refresh_interval
-                            return result
-                    
-                    # If all providers failed
-                    raise UpdateFailed("All joke providers failed to respond")
+                session = async_get_clientsession(self.hass)
+                provider_responded = False
+                for provider in providers:
+                    result = await self._fetch_from_provider(session, provider)
+                    if result:
+                        result[ATTR_LAST_UPDATED] = datetime.now().isoformat()
+                        result[ATTR_REFRESH_INTERVAL] = self._refresh_interval
+                        return result
+                    if result is not None:
+                        provider_responded = True
+
+                if provider_responded:
+                    _LOGGER.debug("No joke matched the configured language and length")
+                    return {}
+                raise UpdateFailed("All compatible joke providers failed to respond")
                     
         except asyncio.TimeoutError as exception:
             raise UpdateFailed(
@@ -276,7 +326,7 @@ class JokesSensor(CoordinatorEntity, SensorEntity):
     @property
     def state(self) -> str:
         """Return the state of the sensor."""
-        if self.coordinator.last_update_success:
+        if self.coordinator.last_update_success and self.coordinator.data:
             return STATE_OK
         return STATE_ERROR
 
@@ -335,11 +385,8 @@ class JokeExplanationSensor(CoordinatorEntity, SensorEntity):
         """
         if self._explanation:
             current = self._current_joke_key()
-            # `current is not None` matters: a failed refresh leaves coordinator.data
-            # empty, and we must not wipe a perfectly good explanation because of it.
-            # A None _explained_joke_key still clears here, so messages produced when no
-            # joke was available disappear once a real joke arrives.
-            if current is not None and current != self._explained_joke_key:
+            # A successful refresh can leave the sensor empty if no joke matched.
+            if self.coordinator.last_update_success and current != self._explained_joke_key:
                 _LOGGER.debug("Joke rotated; clearing the stale explanation")
                 self._explanation = None
                 self._explained_joke_key = None
@@ -420,6 +467,8 @@ class JokeExplanationSensor(CoordinatorEntity, SensorEntity):
                 blocking=True,
                 return_response=True,
             )
+            if self._current_joke_key() != joke_key:
+                return
             
             _LOGGER.info("AI service response: %s", response)
             _LOGGER.info("Response type: %s", type(response))
@@ -438,6 +487,8 @@ class JokeExplanationSensor(CoordinatorEntity, SensorEntity):
             
         except Exception as err:
             _LOGGER.error("Failed to generate joke explanation: %s", err)
+            if self._current_joke_key() != joke_key:
+                return
             self._explanation = f"Error: {str(err)}"
             self.async_write_ha_state()
 

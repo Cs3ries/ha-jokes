@@ -12,7 +12,7 @@
  * Version is kept in lockstep with the integration's manifest.json.
  */
 
-const CARD_VERSION = "1.7.0";
+const CARD_VERSION = "1.8.0";
 
 console.info(
   `%c HA-JOKES-CARD %c v${CARD_VERSION} `,
@@ -271,7 +271,7 @@ class HaJokesCard extends HTMLElement {
     // Only compare when both sides actually reported an id — providers such as Geek Jokes
     // and Yo Mama send none, and an absent id must not hide a valid explanation.
     const stale = !!explainedFor && !!currentJokeId && explainedFor !== currentJokeId;
-    if (explained && !stale && exp.attributes && exp.attributes.explanation) {
+    if (joke && explained && !stale && exp.attributes && exp.attributes.explanation) {
       const text = exp.attributes.explanation;
       if (els.explanationMarkdown) {
         els.explanationMarkdown.content = text;
@@ -390,7 +390,7 @@ function registerCard() {
       // Must be true: HA's card picker maps this to `showElement`, and with false it renders
       // a bare description placeholder instead of a live preview of the card.
       preview: true,
-      documentationURL: "https://github.com/loryanstrant/ha-jokes",
+      documentationURL: "https://github.com/Cs3ries/ha-jokes",
     });
   }
 }

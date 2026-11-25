@@ -1,29 +1,30 @@
 # Home Assistant Jokes Integration
 
 [![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5?style=flat-square)](https://github.com/hacs/integration)
-[![Release](https://img.shields.io/github/v/release/loryanstrant/ha-jokes?style=flat-square)](https://github.com/loryanstrant/ha-jokes/releases)
-[![Release date](https://img.shields.io/github/release-date/loryanstrant/ha-jokes?style=flat-square)](https://github.com/loryanstrant/ha-jokes/releases)
-[![Downloads](https://img.shields.io/github/downloads/loryanstrant/ha-jokes/total?style=flat-square)](https://github.com/loryanstrant/ha-jokes/releases)
-[![License](https://img.shields.io/github/license/loryanstrant/ha-jokes?style=flat-square)](LICENSE)
-[![Last commit](https://img.shields.io/github/last-commit/loryanstrant/ha-jokes?style=flat-square)](https://github.com/loryanstrant/ha-jokes/commits)
-[![Stars](https://img.shields.io/github/stars/loryanstrant/ha-jokes?style=flat-square)](https://github.com/loryanstrant/ha-jokes/stargazers)
+[![Release](https://img.shields.io/github/v/release/Cs3ries/ha-jokes?style=flat-square)](https://github.com/Cs3ries/ha-jokes/releases)
+[![Release date](https://img.shields.io/github/release-date/Cs3ries/ha-jokes?style=flat-square)](https://github.com/Cs3ries/ha-jokes/releases)
+[![Downloads](https://img.shields.io/github/downloads/Cs3ries/ha-jokes/total?style=flat-square)](https://github.com/Cs3ries/ha-jokes/releases)
+[![License](https://img.shields.io/github/license/Cs3ries/ha-jokes?style=flat-square)](LICENSE)
+[![Last commit](https://img.shields.io/github/last-commit/Cs3ries/ha-jokes?style=flat-square)](https://github.com/Cs3ries/ha-jokes/commits)
+[![Stars](https://img.shields.io/github/stars/Cs3ries/ha-jokes?style=flat-square)](https://github.com/Cs3ries/ha-jokes/stargazers)
 
-[![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=loryanstrant&repository=ha-jokes&category=integration)
+[![Open in HACS](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Cs3ries&repository=ha-jokes&category=integration)
 
-A custom Home Assistant integration that fetches random jokes from multiple sources and provides them as a sensor entity.
+A custom Home Assistant integration that serves random jokes from WitzAPI and other sources. Choose a language and cap the joke length for dashboards, notifications or text-to-speech.
 
 <p align="center"><img width="256" height="256" alt="icon" src="https://github.com/user-attachments/assets/ec238fee-508a-4647-9071-d93bf83a9988" /></p>
 
 
 ## Features
 
-- 🎭 Fetches random jokes from **5 built-in sources** — 3 family-friendly (on by default) plus 2 opt-in sources clearly marked **⚠️ not family-friendly**
+- 🎭 Fetches random jokes from **six sources**, including WitzAPI for German and English
 - 🔀 Random provider selection for variety
 - 🛡️ Fault tolerance - automatically tries alternative providers if one fails
 - 📊 Creates a sensor entity with state "OK" when successful
 - 🏷️ Stores joke text, ID, and source as attributes (no 255 character state limitation)
 - ⏰ Configurable refresh interval (1-1440 minutes, default: 5 minutes)
-- 🌍 **Pick the language JokeAPI answers in** — Czech, German, English or Spanish (default: English)
+- 🌍 **Joke language** applies to every source. New installations default to German.
+- 📏 **Maximum joke length** applies to every full joke. The default is unlimited.
 - 🤖 AI-powered joke explanations using Home Assistant's AI integration
 - ⚙️ Easy configuration through Home Assistant UI
 - 🔄 Supports options flow for changing settings
@@ -35,20 +36,20 @@ A custom Home Assistant integration that fetches random jokes from multiple sour
 ### HACS (Recommended)
 
 1. Open HACS in your Home Assistant instance
-2. Find "Jokes" in the integration list and install it
+2. Add `https://github.com/Cs3ries/ha-jokes` as a custom repository with category **Integration**, then install **Jokes**
 3. Restart Home Assistant
 4. Go to Configuration > Integrations
 5. Click "+ Add Integration" and search for "Jokes"
 
 Or open it directly from here:
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=loryanstrant&repository=ha-jokes&category=integration)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Cs3ries&repository=ha-jokes&category=integration)
 
 
 ### Manual Installation
 
-1. Download the latest release from the [releases page](https://github.com/loryanstrant/ha-jokes/releases)
-2. Extract the contents
+1. Download and extract the [repository archive](https://github.com/Cs3ries/ha-jokes/archive/refs/heads/main.zip) or clone the fork
+2. Open the extracted or cloned repository
 3. Copy the `custom_components/ha_jokes` folder to your Home Assistant `custom_components` directory
 4. Restart Home Assistant
 5. Go to Configuration > Integrations
@@ -62,8 +63,9 @@ Or open it directly from here:
 2. Click **"+ Add Integration"**
 3. Search for **"Jokes"**
 4. Set your desired refresh interval (1-1440 minutes, default: 5)
-5. Pick the **JokeAPI language** if you want something other than English
-6. Click **"Submit"**
+5. Choose the **Joke language** and at least one provider that serves it
+6. Set **Maximum joke length (characters)** if needed
+7. Click **"Submit"**
 
 ### Changing Options
 
@@ -71,51 +73,32 @@ Or open it directly from here:
 2. Find the **Jokes** integration
 3. Click **"Configure"**
 4. Adjust the refresh interval as needed
-5. Select/de-select joke providers
-6. Change the **JokeAPI language** if you want something other than English
-7. Click **"Submit"**
-
-The setup and options screens list every joke source. The two opt-in sources are labelled
-**⚠️ not family-friendly** and are unchecked by default:
-
-<img alt="Jokes setup dialog — choosing joke providers, with Geek Jokes and Yo Mama marked not family-friendly and off by default" src="images/config-flow.png" width="640" />
+5. Adjust **Joke providers**, **Joke language** and **Maximum joke length (characters)**
+6. Click **"Submit"**
 
 ### Joke Language
 
-**JokeAPI language** sets the language that [JokeAPI v2](https://v2.jokeapi.dev/) is asked
-for. It is available on both the setup and the options screens, and defaults to **English**,
-so existing installations are unaffected.
+| Language | Compatible sources |
+|----------|--------------------|
+| German (default for new installations) | WitzAPI, JokeAPI |
+| English | WitzAPI, JokeAPI, icanhazdadjoke.com, Official Joke API, Geek Jokes, Yo Mama Jokes |
+| Czech | JokeAPI |
+| Spanish | JokeAPI |
 
-| Code | Language |
-|------|----------|
-| `cs` | Czech |
-| `de` | German |
-| `en` | English (default) |
-| `es` | Spanish |
+The integration uses the selected sources that support your chosen language. With **Deutsch** selected, it fetches only German jokes, even when English-only sources are selected. New installations include WitzAPI and JokeAPI in the default selection. To fetch German jokes exclusively from WitzAPI, select **Deutsch** and enable only **WitzAPI (witzapi.de)**.
 
-> ⚠️ **This setting only affects JokeAPI**, because it is the only one of the five sources
-> that serves jokes in more than one language. icanhazdadjoke, Official Joke API, Geek Jokes
-> and Yo Mama Jokes are English-only. If you want jokes exclusively in another language,
-> de-select the other providers and leave only **JokeAPI** enabled — otherwise you will get a
-> mix of your chosen language and English.
->
-> JokeAPI's non-English collections are **much** smaller than its English one, so you will
-> see jokes repeat sooner — as of October 2026 it holds 183 English jokes of the kind this
-> integration asks for, against 29 German, 6 Spanish and 2 Czech.
->
-> French and Portuguese are deliberately **not** offered: JokeAPI lists them, but every one
-> of its French and Portuguese jokes is a two-part setup-and-punchline joke, and this
-> integration asks for single-line jokes only. Selecting them would mean JokeAPI never
-> returning anything at all. If JokeAPI has nothing to return, the integration falls back to the next
-> enabled provider as usual.
+Existing installations keep their saved language and provider settings. To add WitzAPI to an existing installation, enable it in **Configure**. If a saved selection has no source for its language, the integration uses JokeAPI until you save a compatible selection. Older configurations without a saved language default to English.
 
+### Maximum Joke Length
+
+Enter a character limit, such as **120** for a notification, or **0** for unlimited length. Spaces and line breaks inside the joke count. The integration skips longer jokes and checks other candidates or compatible sources to preserve complete jokes. When none of the candidates fits, the sensor has no joke for that refresh. A very small limit can leave it empty until a later refresh or until you raise the limit.
 
 ## Usage
 
 After installation, the integration creates a sensor entity:
 
 - **Entity ID**: `sensor.joke`
-- **State**: "OK" when successful, "Error" when failed
+- **State**: "OK" when a joke is available, "Error" when a provider responds without a suitable joke, or "unavailable" when the refresh fails
 - **Icon**: 🙂 (mdi:emoticon-happy-outline)
 
 ### Attributes
@@ -143,10 +126,15 @@ name: "Joke of the Moment"
 type: markdown
 content: |
   ## 😄 Joke
-  {{ state_attr('sensor.joke', 'joke') }}
-  
+  {% set joke = state_attr('sensor.joke', 'joke') %}
+  {% if joke %}
+  {{ joke }}
+
   *Last updated @ {{ as_datetime(state_attr('sensor.joke', 'last_updated')).strftime('%H:%M %d %b %Y') }}*
   *Source: {{ state_attr('sensor.joke', 'source') }}*
+  {% else %}
+  *No joke available.*
+  {% endif %}
 ```
 <img width="515" height="142" alt="image" src="https://github.com/user-attachments/assets/02296d98-f871-4a0f-93fe-df820ee80b16" />
 
@@ -157,10 +145,15 @@ content: |
 type: markdown
 content: |
   ## 😄 Joke
-  {{ state_attr('sensor.joke', 'joke') }}
-  
+  {% set joke = state_attr('sensor.joke', 'joke') %}
+  {% if joke %}
+  {{ joke }}
+
   *Last updated: {{ relative_time(as_datetime(state_attr('sensor.joke', 'last_updated'))) }} ago*
   *Source: {{ state_attr('sensor.joke', 'source') }}*
+  {% else %}
+  *No joke available.*
+  {% endif %}
 ```
 <img width="518" height="147" alt="image" src="https://github.com/user-attachments/assets/076e83af-d8e4-43a6-bdd8-02635eb8f6cb" />
 
@@ -201,13 +194,13 @@ custom_fields:
   joke: |
     [[[
       return `<div style="font-size: 16px; line-height: 1.5; margin-top: 10px;">
-        ${states['sensor.joke'].attributes.joke}
+        ${states['sensor.joke']?.attributes.joke ?? 'No joke available.'}
       </div>`
     ]]]
   source: |
     [[[
       return `<div style="font-size: 12px; color: var(--secondary-text-color); margin-top: 10px;">
-        Source: ${states['sensor.joke'].attributes.source}
+        ${states['sensor.joke']?.attributes.source ?? ''}
       </div>`
     ]]]
 ```
@@ -244,11 +237,14 @@ automation:
       - platform: state
         entity_id: sensor.joke
         attribute: joke
+    condition:
+      - condition: template
+        value_template: "{{ trigger.to_state is not none and trigger.to_state.attributes.get('joke') is not none }}"
     action:
       - service: notify.mobile_app_your_phone
         data:
           title: "New Joke!"
-          message: "{{ state_attr('sensor.joke', 'joke') }}"
+          message: "{{ trigger.to_state.attributes.joke }}"
 ```
 
 ### AI-Powered Joke Explanations
@@ -401,9 +397,7 @@ This integration fetches jokes from several different sources, automatically sel
 2. **[JokeAPI v2](https://v2.jokeapi.dev/)** - A RESTful API serving jokes
    - Configured in safe mode (no explicit content)
    - Returns single-line jokes only
-   - 🌍 **Multi-lingual** — Czech, German, English and Spanish, selectable
-     in the integration options (see [Joke Language](#joke-language)). The only source here
-     that is not English-only
+   - Serves Czech, German, English and Spanish
    - Free and open source
    - No API key required
 
@@ -423,17 +417,20 @@ This integration fetches jokes from several different sources, automatically sel
    - Returns single-line jokes
    - Free, no API key required
 
-The integration randomly selects which provider to use for each joke request. If a provider fails to respond, it automatically tries the next provider, ensuring you always get a joke as long as at least one service is available.
+6. **[WitzAPI](https://witzapi.de/api-docs/)** — German and English jokes
+   - Enabled by default for new installations
+   - Serves plain joke text without an API key or joke ID
+   - The API offers no safe mode. Enable JokeAPI alone if you need its safe-mode filter.
+
+The integration tries compatible providers in random order until it finds a joke within the configured length. When a limit is set, it requests up to 20 candidates from WitzAPI and up to 10 from JokeAPI in a single request per provider.
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Sensor shows "Error" state**
-   - Check your internet connection
-   - Verify that at least one joke API is accessible
-   - Check Home Assistant logs for detailed error messages
-   - The integration will automatically try alternative providers
+1. **Sensor shows "Error" or "unavailable"**
+   - For "Error", increase the **Maximum joke length** or set it to 0 to allow any length
+   - For "unavailable", check your internet connection and Home Assistant logs for provider errors
 
 2. **Integration not appearing**
    - Ensure you've restarted Home Assistant after installation
@@ -457,9 +454,15 @@ logger:
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+This fork builds on [loryanstrant/ha-jokes](https://github.com/loryanstrant/ha-jokes). Contributions are welcome.
 
 ## Development Approach
+
+Run the regression tests with the `pytest-homeassistant-custom-component` plugin installed:
+
+```sh
+python -m pytest -o asyncio_mode=auto -o asyncio_default_fixture_loop_scope=function tests
+```
 
 <img width="256" height="256" alt="Vibe Coding with GitHub Copilot 256x256" src="https://github.com/user-attachments/assets/c8360318-0c18-4152-be59-3f3dcf4964a1" />
 
@@ -470,12 +473,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-- [Issues](https://github.com/loryanstrant/ha-jokes/issues)
+- [Issues](https://github.com/Cs3ries/ha-jokes/issues)
 - [Home Assistant Community Forum](https://community.home-assistant.io/)
 
 ## Credits
 
 - Jokes provided by:
+  - [WitzAPI](https://witzapi.de/)
   - [icanhazdadjoke.com](https://icanhazdadjoke.com/)
   - [JokeAPI v2](https://v2.jokeapi.dev/) by Sven Fehler
   - [Official Joke API](https://github.com/15Dkatz/official_joke_api) by David Katz

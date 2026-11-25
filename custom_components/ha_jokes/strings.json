@@ -3,42 +3,46 @@
     "step": {
       "user": {
         "title": "Jokes Setup",
-        "description": "Configure your Jokes integration",
+        "description": "Configure your Jokes integration.",
         "data": {
           "refresh_interval": "Refresh interval (minutes)",
           "providers": "Joke providers",
-          "jokeapi_language": "JokeAPI language"
+          "jokeapi_language": "Joke language",
+          "max_joke_length": "Maximum joke length (characters)"
         },
         "data_description": {
-          "providers": "Select which joke sources to use. Note: \"Geek Jokes\" (mostly Chuck Norris / crude) and \"Yo Mama Jokes\" (roast humour) serve unfiltered adult content and are not family-friendly — both are off by default.",
-          "jokeapi_language": "Choose the language to request from JokeAPI when that provider is enabled."
+          "providers": "WitzAPI serves German and English with no safe mode. JokeAPI serves all listed languages. The other sources serve English only. Geek Jokes and Yo Mama Jokes contain unfiltered adult content.",
+          "jokeapi_language": "Only sources that serve this language are used.",
+          "max_joke_length": "Enter 0 for unlimited length. Spaces and line breaks inside the joke count toward the limit."
         }
       }
     },
     "error": {
-      "invalid_refresh_interval": "Refresh interval must be between 1 and 1440 minutes",
-      "no_providers_selected": "At least one joke provider must be selected"
+      "no_providers_selected": "Select at least one joke provider.",
+      "no_compatible_providers": "Select a provider that serves the chosen language."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "Jokes Options",
-        "description": "Configure Jokes options",
+        "description": "Change your Jokes settings.",
         "data": {
           "refresh_interval": "Refresh interval (minutes)",
           "providers": "Joke providers",
-          "jokeapi_language": "JokeAPI language"
+          "jokeapi_language": "Joke language",
+          "max_joke_length": "Maximum joke length (characters)"
         },
         "data_description": {
-          "providers": "Select which joke sources to use. Note: \"Geek Jokes\" (mostly Chuck Norris / crude) and \"Yo Mama Jokes\" (roast humour) serve unfiltered adult content and are not family-friendly — both are off by default.",
-          "jokeapi_language": "Choose the language to request from JokeAPI when that provider is enabled."
+          "providers": "WitzAPI serves German and English with no safe mode. JokeAPI serves all listed languages. The other sources serve English only. Geek Jokes and Yo Mama Jokes contain unfiltered adult content.",
+          "jokeapi_language": "Only sources that serve this language are used.",
+          "max_joke_length": "Enter 0 for unlimited length. Spaces and line breaks inside the joke count toward the limit."
         }
       }
     },
     "error": {
-      "invalid_refresh_interval": "Refresh interval must be between 1 and 1440 minutes",
-      "no_providers_selected": "At least one joke provider must be selected"
+      "no_providers_selected": "Select at least one joke provider.",
+      "no_compatible_providers": "Select a provider that serves the chosen language."
     }
   }
 }

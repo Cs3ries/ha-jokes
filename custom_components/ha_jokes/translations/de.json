@@ -1,0 +1,48 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Witze einrichten",
+        "description": "Richte die Witze-Integration ein.",
+        "data": {
+          "refresh_interval": "Aktualisierungsintervall (Minuten)",
+          "providers": "Witzquellen",
+          "jokeapi_language": "Sprache der Witze",
+          "max_joke_length": "Maximale Witzlänge (Zeichen)"
+        },
+        "data_description": {
+          "providers": "WitzAPI liefert deutsche und englische Witze und bietet keinen Jugendschutzfilter. JokeAPI unterstützt alle angebotenen Sprachen. Die übrigen Quellen liefern nur englische Witze. Geek Jokes und Yo Mama Jokes liefern ungefilterte Inhalte für Erwachsene.",
+          "jokeapi_language": "Die Integration verwendet nur Quellen, die Witze in dieser Sprache anbieten.",
+          "max_joke_length": "0 hebt die Begrenzung auf. Leerzeichen und Zeilenumbrüche innerhalb des Witzes zählen mit."
+        }
+      }
+    },
+    "error": {
+      "no_providers_selected": "Wähle mindestens eine Witzquelle aus.",
+      "no_compatible_providers": "Wähle eine Quelle aus, die Witze in der gewählten Sprache anbietet."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Witze konfigurieren",
+        "description": "Ändere die Einstellungen der Witze-Integration.",
+        "data": {
+          "refresh_interval": "Aktualisierungsintervall (Minuten)",
+          "providers": "Witzquellen",
+          "jokeapi_language": "Sprache der Witze",
+          "max_joke_length": "Maximale Witzlänge (Zeichen)"
+        },
+        "data_description": {
+          "providers": "WitzAPI liefert deutsche und englische Witze und bietet keinen Jugendschutzfilter. JokeAPI unterstützt alle angebotenen Sprachen. Die übrigen Quellen liefern nur englische Witze. Geek Jokes und Yo Mama Jokes liefern ungefilterte Inhalte für Erwachsene.",
+          "jokeapi_language": "Die Integration verwendet nur Quellen, die Witze in dieser Sprache anbieten.",
+          "max_joke_length": "0 hebt die Begrenzung auf. Leerzeichen und Zeilenumbrüche innerhalb des Witzes zählen mit."
+        }
+      }
+    },
+    "error": {
+      "no_providers_selected": "Wähle mindestens eine Witzquelle aus.",
+      "no_compatible_providers": "Wähle eine Quelle aus, die Witze in der gewählten Sprache anbietet."
+    }
+  }
+}

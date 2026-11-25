@@ -2,15 +2,15 @@
   "domain": "ha_jokes",
   "name": "Jokes",
   "codeowners": [
-    "@loryanstrant"
+    "@Cs3ries"
   ],
   "config_flow": true,
   "dependencies": [
     "http",
     "frontend"
   ],
-  "documentation": "https://github.com/loryanstrant/ha-jokes",
+  "documentation": "https://github.com/Cs3ries/ha-jokes",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/loryanstrant/ha-jokes/issues",
-  "version": "1.7.0"
+  "issue_tracker": "https://github.com/Cs3ries/ha-jokes/issues",
+  "version": "1.8.0"
 }

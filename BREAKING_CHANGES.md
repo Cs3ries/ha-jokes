@@ -1,5 +1,13 @@
 # Breaking Changes
 
+## Version 1.8.0
+
+**Joke language** now applies to every source. An existing configuration set to German, Czech or Spanish will serve jokes in that language, even if it also has English-only sources selected. If none of the saved sources supports the selected language, JokeAPI serves that language until a compatible selection is saved.
+
+New installations default to German with WitzAPI and JokeAPI enabled. Existing installations retain their saved language and can enable WitzAPI under **Configure**. WitzAPI offers no safe mode.
+
+The new **Maximum joke length (characters)** setting defaults to 0, which allows any length.
+
 ## Version 1.7.0
 
 ### Minimum Home Assistant version is now 2024.11.0

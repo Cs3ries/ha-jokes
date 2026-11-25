@@ -2,7 +2,7 @@
 
 DOMAIN = "ha_jokes"
 NAME = "Jokes"
-VERSION = "1.7.0"
+VERSION = "1.8.0"
 
 # API Configuration for icanhazdadjoke.com
 API_URL_ICANHAZDADJOKE = "https://icanhazdadjoke.com"
@@ -14,6 +14,12 @@ API_HEADERS_ICANHAZDADJOKE = {
 # API Configuration for JokeAPI v2
 API_URL_JOKEAPI = "https://v2.jokeapi.dev/joke/Any?safe-mode&type=single"
 API_HEADERS_JOKEAPI = {
+    "Accept": "application/json",
+    "User-Agent": "Home Assistant Jokes Integration",
+}
+
+API_URL_WITZAPI = "https://witzapi.de/api/joke/"
+API_HEADERS_WITZAPI = {
     "Accept": "application/json",
     "User-Agent": "Home Assistant Jokes Integration",
 }
@@ -57,6 +63,8 @@ SENSOR_ICON = "mdi:emoticon-happy-outline"
 CONF_REFRESH_INTERVAL = "refresh_interval"
 CONF_PROVIDERS = "providers"
 CONF_JOKEAPI_LANGUAGE = "jokeapi_language"
+CONF_MAX_JOKE_LENGTH = "max_joke_length"
+DEFAULT_MAX_JOKE_LENGTH = 0  # unlimited
 
 # Attributes
 ATTR_JOKE = "joke"
@@ -72,6 +80,7 @@ PROVIDER_JOKEAPI = "jokeapi"
 PROVIDER_OFFICIAL = "official_joke_api"
 PROVIDER_GEEKJOKES = "geek_jokes"
 PROVIDER_YOMAMA = "yomama_jokes"
+PROVIDER_WITZAPI = "witzapi"
 
 # Default providers (family-friendly sources enabled by default).
 # PROVIDER_GEEKJOKES and PROVIDER_YOMAMA are intentionally excluded — both serve
@@ -82,7 +91,9 @@ DEFAULT_PROVIDERS = [
     PROVIDER_JOKEAPI,
     PROVIDER_OFFICIAL,
 ]
-DEFAULT_JOKEAPI_LANGUAGE = "en"
+DEFAULT_NEW_PROVIDERS = [PROVIDER_WITZAPI, *DEFAULT_PROVIDERS]
+DEFAULT_JOKEAPI_LANGUAGE = "en"  # existing entries without a stored language
+DEFAULT_NEW_LANGUAGE = "de"
 # JokeAPI declares six joke languages, but we query it with type=single and its
 # French and Portuguese corpora contain *only* two-part (setup/delivery) jokes.
 # Asking for either returns HTTP 400 "No matching joke found" on every call, so
@@ -92,12 +103,30 @@ DEFAULT_JOKEAPI_LANGUAGE = "en"
 # To offer French and Portuguese we would have to stop hard-coding
 # type=single and render two-part jokes; see the note in BREAKING_CHANGES.md.
 JOKEAPI_LANGUAGE_OPTIONS = {
-    "cs": "Czech",
-    "de": "German",
+    "cs": "Čeština",
+    "de": "Deutsch",
     "en": "English",
-    "es": "Spanish",
+    "es": "Español",
+}
+
+PROVIDER_LANGUAGES = {
+    PROVIDER_ICANHAZDADJOKE: {"en"},
+    PROVIDER_JOKEAPI: JOKEAPI_LANGUAGE_OPTIONS.keys(),
+    PROVIDER_OFFICIAL: {"en"},
+    PROVIDER_GEEKJOKES: {"en"},
+    PROVIDER_YOMAMA: {"en"},
+    PROVIDER_WITZAPI: {"de", "en"},
 }
 
 # States
 STATE_OK = "OK"
 STATE_ERROR = "Error"
+
+
+def providers_for_language(providers: list[str], language: str) -> list[str]:
+    """Return the configured providers that serve the requested language."""
+    return [
+        provider
+        for provider in providers
+        if language in PROVIDER_LANGUAGES.get(provider, ())
+    ]

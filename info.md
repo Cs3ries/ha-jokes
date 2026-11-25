@@ -4,12 +4,13 @@ Bring some humor to your Home Assistant setup with random jokes from multiple so
 
 ## What it does
 
-This integration fetches random jokes from up to five different joke APIs and makes them available as a sensor in Home Assistant. It randomly selects which provider to use and includes fault tolerance to automatically try alternative providers if one fails. It also **ships its own Lovelace card**.
+This integration fetches random jokes from six sources, including WitzAPI, and makes them available as a sensor in Home Assistant. It tries compatible providers in random order and **ships its own Lovelace card**.
 
 ## Key Features
 
-- 🎭 **Multiple Joke Sources**: Fetches from icanhazdadjoke.com, JokeAPI v2, and Official Joke API — plus Geek Jokes and Yo Mama, which serve unfiltered adult/edgy content and are **opt-in only**
-- 🌍 **Not English-only**: JokeAPI can be asked for Czech, German, English or Spanish jokes (default: English). The other four sources are English-only, so leave only JokeAPI enabled if you want one language throughout
+- 🎭 **Multiple Joke Sources** include WitzAPI, JokeAPI v2, icanhazdadjoke.com and Official Joke API. Geek Jokes and Yo Mama Jokes are opt-in sources with unfiltered adult content.
+- 🌍 **Joke language** applies to every source. New installations default to German with WitzAPI and JokeAPI enabled.
+- 📏 **Maximum joke length (characters)** applies to the full joke. Enter 0 for unlimited length. The sensor stays empty for a refresh when no candidate fits.
 - 🃏 **Bundled Lovelace Card**: `custom:ha-jokes-card` is included and auto-registered — nothing extra to install, no resource to add by hand. Just pick **"Jokes Card"** in the card picker
 - 🔀 **Random Selection**: Providers are randomly selected for variety
 - 🛡️ **Fault Tolerance**: Automatically tries alternative providers if one fails
@@ -31,12 +32,13 @@ This integration fetches random jokes from up to five different joke APIs and ma
 
 ## Technical Details
 
-- **Entity**: `sensor.joke` with state "OK" or "Error"
+- **Entity**: `sensor.joke` with state "OK" when a joke is available, "Error" if no candidate fits, or "unavailable" if the refresh fails
 - **Attributes**: `joke`, `joke_id`, `source`, `last_updated`, `refresh_interval`
 - **Icon**: 🙂 (mdi:emoticon-happy-outline)
 - **Updates**: Configurable interval from 1-1440 minutes
-- **APIs**: Uses icanhazdadjoke.com, JokeAPI v2 (safe mode), and Official Joke API by default; Geek Jokes and Yo Mama can be enabled in the options flow (no API keys required)
-- **Languages**: `cs`, `de`, `en` (default), `es` — JokeAPI only
+- **APIs**: WitzAPI offers no safe mode. JokeAPI uses safe mode. The APIs require no keys.
+- **Languages**: WitzAPI serves German and English. JokeAPI also serves Czech and Spanish. All other sources serve English only.
+- **Options**: Change the language, length limit and sources under **Settings → Devices & Services → Jokes → Configure**. Enable WitzAPI there for an existing installation.
 - **Card**: `custom:ha-jokes-card` — shows the joke, its source, how long ago it updated, and **Explain it** / **New joke** buttons
 
 Ready to add some humor to your smart home? Install now and let the laughs begin! 😄

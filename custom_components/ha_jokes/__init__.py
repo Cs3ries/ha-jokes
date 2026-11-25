@@ -12,9 +12,11 @@ from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import (
     CONF_JOKEAPI_LANGUAGE,
+    CONF_MAX_JOKE_LENGTH,
     CONF_PROVIDERS,
     CONF_REFRESH_INTERVAL,
     DEFAULT_JOKEAPI_LANGUAGE,
+    DEFAULT_MAX_JOKE_LENGTH,
     DEFAULT_PROVIDERS,
     DEFAULT_REFRESH_INTERVAL,
     DOMAIN,
@@ -91,7 +93,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # setup_retry -- which is the failure this release exists to remove.
     if jokeapi_language not in JOKEAPI_LANGUAGE_OPTIONS:
         _LOGGER.warning(
-            "JokeAPI language %r is no longer supported; falling back to %s",
+            "Joke language %r is no longer supported; falling back to %s",
             jokeapi_language,
             DEFAULT_JOKEAPI_LANGUAGE,
         )
@@ -105,6 +107,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         enabled_providers,
         jokeapi_language,
         entry,
+        max_joke_length=entry.options.get(CONF_MAX_JOKE_LENGTH, DEFAULT_MAX_JOKE_LENGTH),
     )
     
     # Fetch initial data - this can raise ConfigEntryNotReady
