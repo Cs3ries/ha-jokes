@@ -2,11 +2,11 @@
 
 ## Version 1.8.0
 
-**Joke language** now applies to every source. An existing configuration set to German, Czech or Spanish will serve jokes in that language, even if it also has English-only sources selected. If none of the saved sources supports the selected language, JokeAPI serves that language until a compatible selection is saved.
+**Sprache der Witze** gilt jetzt für alle Quellen. Wenn in einer bestehenden Installation Deutsch, Tschechisch oder Spanisch ausgewählt ist, werden englischsprachige Quellen übersprungen. Falls keine der gespeicherten Quellen die gewählte Sprache anbietet, verwendet die Integration JokeAPI, bis du eine passende Quelle auswählst.
 
-New installations default to German with WitzAPI and JokeAPI enabled. Existing installations retain their saved language and can enable WitzAPI under **Configure**. WitzAPI offers no safe mode.
+Neue Installationen starten auf Deutsch mit WitzAPI und JokeAPI. Bei bestehenden Installationen bleibt die gespeicherte Sprache wirksam, sofern sie weiterhin unterstützt wird. Ohne gespeicherte oder mit einer inzwischen ungültigen Sprache verwendet die Integration Englisch. WitzAPI kannst du unter **Konfigurieren** aktivieren. WitzAPI liefert Witze ohne Jugendschutzfilter.
 
-The new **Maximum joke length (characters)** setting defaults to 0, which allows any length.
+Unter **Maximale Witzlänge (Zeichen)** kannst du die Länge des vollständigen Witzes begrenzen. Der Standardwert `0` erlaubt jede Länge. [Release v1.8.0](https://github.com/Cs3ries/ha-jokes/releases/tag/v1.8.0)
 
 ## Version 1.7.0
 
